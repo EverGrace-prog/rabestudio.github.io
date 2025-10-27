@@ -1,0 +1,58 @@
+/* ===== RABE STUDIO — Black & Gold Minimal ===== */
+:root{
+  --bg:#000; --gold:#C6A667; --text:#E7E3DA; --muted:#9c9488; --card:#0b0b0b;
+  --maxw:980px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font:16px/1.65 system-ui,-apple-system,Segoe UI,Arial,Helvetica,sans-serif}
+
+.container{max-width:var(--maxw);margin:0 auto;padding:32px 20px}
+a{color:var(--gold);text-decoration:none}
+a:hover{opacity:.85}
+h1,h2,h3{font-weight:500;letter-spacing:.5px;margin:0 0 .6rem;color:var(--gold)}
+h1{font-size:2rem} h2{font-size:1.35rem} h3{font-size:1.05rem}
+p{margin:.6rem 0}
+.list{margin:.4rem 0 0 1rem}
+blockquote{margin:.6rem 0;padding:.6rem 1rem;border-left:3px solid var(--gold);color:#d9d3c9}
+
+.header{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px 20px;border-bottom:1px solid #111;background:#000;position:sticky;top:0;z-index:10}
+.brand{display:flex;align-items:center;gap:12px}
+.brand img{width:44px;height:44px;object-fit:cover;border-radius:6px;filter:drop-shadow(0 0 12px rgba(198,166,103,.25))}
+.logo{font-size:1.05rem;color:var(--gold);letter-spacing:1px}
+.subtitle{font-size:.8rem;color:var(--muted)}
+.lang a{margin-left:10px}
+.nav a{margin:0 10px;color:var(--text)}
+.nav a:hover{color:var(--gold)}
+
+.hero{
+  position:relative;overflow:hidden;isolation:isolate;
+  background:
+    radial-gradient(60% 60% at 60% 30%, rgba(198,166,103,.22), rgba(0,0,0,0) 60%),
+    radial-gradient(70% 70% at 30% 60%, rgba(198,166,103,.12), rgba(0,0,0,0) 65%),
+    #000;
+}
+.hero .inner{max-width:var(--maxw);margin:0 auto;padding:68px 20px 52px;display:grid;grid-template-columns:110px 1fr;gap:20px;align-items:center}
+.hero .mark{
+  width:110px;height:110px;background:url('logo-glow.png') center/contain no-repeat;
+  filter:drop-shadow(0 0 18px rgba(198,166,103,.35));
+}
+.hero h1{font-size:2.2rem;margin:0 0 .25rem}
+.hero p{color:#d9d3c9;margin:0}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin-top:22px}
+.card{background:var(--card);border:1px solid #131313;border-radius:10px;padding:16px}
+.card h3{margin-bottom:.25rem}
+.button{display:inline-block;padding:8px 14px;border:1px solid var(--gold);border-radius:8px}
+.button.gold{background:var(--gold);color:#201b12;border-color:var(--gold)}
+.breadcrumbs{font-size:.85rem;color:var(--muted);margin-bottom:12px}
+.hnav{margin-top:18px}
+
+footer{border-top:1px solid #111;color:var(--muted);font-size:.9rem}
+footer a{color:var(--muted)} footer a:hover{color:var(--gold)}
+
+/* responsive */
+@media (max-width:640px){
+  .hero .inner{grid-template-columns:70px 1fr;padding:52px 16px 36px}
+  .hero .mark{width:70px;height:70px}
+  .brand img{width:38px;height:38px}
+}
