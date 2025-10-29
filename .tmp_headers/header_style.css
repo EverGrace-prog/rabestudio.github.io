@@ -1,0 +1,5 @@
+.site-header{display:flex;align-items:center;justify-content:space-between;gap:.75rem;margin:0 auto 1.25rem auto;padding:.75rem 0;border-bottom:1px solid rgba(255,255,255,.08)}
+.site-header .brand{display:flex;align-items:center;gap:.5rem;font-weight:700;text-decoration:none}
+.site-header .brand img{display:block;border-radius:4px}
+.site-header .nav a{margin-left:1rem;text-decoration:none;opacity:.9}
+.site-header .nav a:hover{opacity:1}
