@@ -1,0 +1,6 @@
+.site-header{display:flex;align-items:center;justify-content:space-between;gap:.75rem;padding:.75rem 0;border-bottom:1px solid rgba(255,255,255,.08)}
+.site-header .brand{display:flex;align-items:center;gap:.5rem;font-weight:700;text-decoration:none;color:inherit}
+.site-header img{display:block;border-radius:4px}
+.site-header .nav a{margin-left:1rem;text-decoration:none;opacity:.9;color:inherit}
+.site-header .nav a:hover{opacity:1}
+.site-footer{margin-top:3rem;padding:1.5rem 0;border-top:1px solid rgba(255,255,255,.08);opacity:.9}
