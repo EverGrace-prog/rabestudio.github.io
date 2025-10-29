@@ -1,79 +1,92 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-echo "▶ Fix RABE STUDIO — paths & links for GitHub Pages"
+echo "▶ RABE STUDIO — Fix paths + ensure CSS & favicon"
 
-# -------- helper sed (compat Windows Git Bash) --------
-_sed() { sed -i 's|\r$||' "$1" 2>/dev/null || true; }
+# helper
 rpl()  { sed -i "s|$1|$2|g" "$3"; }
+nl2lf(){ sed -i 's|\r$||' "$1" 2>/dev/null || true; }
 
-# -------- scope --------
 ROOT="."
 LANGS=("it" "en" "de")
 
-# 0) Normalizza fine-riga CRLF→LF solo per .html
-echo "• Normalize line endings"
-find "$ROOT" -type f -name "*.html" -not -path "*/assets/*" -print0 | while IFS= read -r -d '' f; do _sed "$f"; done
+# 0) normalizza line endings
+find "$ROOT" -type f -name "*.html" -not -path "*/assets/*" -print0 | while IFS= read -r -d '' f; do nl2lf "$f"; done
 
-# 1) File al livello lingua (es: it/index.html, it/catalog.html, it/vision.html, it/marketplace.html)
-echo "• Fix assets paths in language root pages (../assets/…)"
+# 1) fix path assets nei file a livello lingua (../assets/…)
 for L in "${LANGS[@]}"; do
   for f in "$L"/*.html; do
     [ -e "$f" ] || continue
     rpl 'href="/assets/'  'href="../assets/'  "$f"
     rpl 'src="/assets/'   'src="../assets/'   "$f"
-    # Se ci fossero ancora riferimenti assoluti a /it /en /de, rendili relativi
-    rpl 'href="/it/' 'href="it/' "$ROOT/index.html" 2>/dev/null || true
-    rpl 'href="/en/' 'href="en/' "$ROOT/index.html" 2>/dev/null || true
-    rpl 'href="/de/' 'href="de/' "$ROOT/index.html" 2>/dev/null || true
   done
 done
 
-# 2) File dentro works/ (es: it/works/*.html) → due livelli: ../../assets/…
-echo "• Fix assets paths in works pages (../../assets/…)"
+# 2) fix path assets nelle pagine works (../../assets/…)
 for L in "${LANGS[@]}"; do
   for f in "$L/works/"*.html; do
     [ -e "$f" ] || continue
-    rpl 'href="/assets/'  'href="../../assets/' "$f"
-    rpl 'src="/assets/'   'src="../../assets/'  "$f"
-    # In caso qualcuno abbia messo ../assets per sbaglio, portalo a ../../assets
+    rpl 'href="/assets/'   'href="../../assets/' "$f"
+    rpl 'src="/assets/'    'src="../../assets/'  "$f"
     rpl 'href="../assets/' 'href="../../assets/' "$f"
-    rpl 'src="../assets/'  'src="../../assets/"' "$f"
+    rpl 'src="../assets/'  'src="../../assets/'  "$f"
   done
 done
 
-# 3) Homepage root (index.html) deve restare su "assets/" relativo
+# 3) root index deve restare con assets/ (non ../)
 if [ -f "index.html" ]; then
-  echo "• Ensure root index keeps assets/ (not ../assets/)"
   rpl 'href="../assets/' 'href="assets/' index.html
   rpl 'src="../assets/'  'src="assets/'  index.html
   rpl 'href="/assets/'   'href="assets/' index.html
   rpl 'src="/assets/'    'src="assets/'  index.html
 fi
 
-# 4) Favicon & logo (qualunque percorso assoluto → relativo corretto)
-echo "• Unify favicon & logo paths"
-find "$ROOT" -type f -name "*.html" -not -path "*/assets/*" -print0 | while IFS= read -r -d '' f; do
+# 4) uniforma favicon/logo in tutti i file e ASSICURA presenza <link rel="stylesheet"> e favicon
+ensure_head_bits () {
+  local f="$1"
+  # determina profondità
+  local UP=""
   case "$f" in
-    */works/*)   UP="../../" ;;
-    */it/*|*/en/*|*/de/*) UP="../" ;;
-    *)           UP="" ;;
+    */works/*)   UP='../../' ;;
+    */it/*|*/en/*|*/de/*) UP='../' ;;
+    *)           UP='' ;;
   esac
-  # favicon canonica
-  sed -i "s|href=\"/assets/favicon\.png\"|href=\"${UP}assets/favicon.png\"|g" "$f"
-  sed -i "s|href=\"/assets/favicon\.ico\"|href=\"${UP}assets/favicon.ico\"|g" "$f"
-  # logo canonico (se usi assets/photo.jpg o simili)
+
+  # assicura <head> esista
+  if ! grep -qi '<head' "$f"; then
+    sed -i '1s|^|<head></head>\n|' "$f"
+  fi
+
+  # CSS: <link rel="stylesheet" href="…assets/style.css">
+  if ! grep -qi 'rel="stylesheet"' "$f"; then
+    sed -i "0,/<head>/s||<head>\n  <meta charset=\"utf-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n  <link rel=\"stylesheet\" href=\"${UP}assets/style.css\">|" "$f"
+  fi
+
+  # se il link al CSS c'è ma con path assoluto, correggi
+  sed -i "s|href=\"/assets/style.css\"|href=\"${UP}assets/style.css\"|g" "$f"
+
+  # FAVICON: inserisci se assente
+  if ! grep -qi 'rel="icon"' "$f"; then
+    sed -i "0,/<head>/s||<head>\n  <link rel=\"icon\" href=\"${UP}assets/favicon.png\">\n  <link rel=\"shortcut icon\" href=\"${UP}assets/favicon.ico\">|" "$f"
+  else
+    sed -i "s|href=\"/assets/favicon\.png\"|href=\"${UP}assets/favicon.png\"|g" "$f"
+    sed -i "s|href=\"/assets/favicon\.ico\"|href=\"${UP}assets/favicon.ico\"|g" "$f"
+  fi
+
+  # logo <img … src="…assets/photo.jpg"> se presente con /assets, rendilo relativo
   sed -i "s|src=\"/assets/|src=\"${UP}assets/|g" "$f"
+}
+
+# applica ai file
+find "$ROOT" -type f -name "*.html" -not -path "*/assets/*" -print0 | while IFS= read -r -d '' f; do
+  ensure_head_bits "$f"
 done
 
-# 5) Report rapido per link ancora assoluti (dovrebbero essere 0)
-echo "• Scan for remaining absolute links (/assets or /it|/en|/de)"
-REM=$(grep -Rn --exclude-dir=assets -E 'href="/(assets|it|en|de)/|src="/assets/' || true)
-if [ -n "$REM" ]; then
-  echo "⚠ Restano link assoluti da correggere manualmente:"
-  echo "$REM"
-else
-  echo "✓ Nessun link assoluto residuo."
-fi
+# 5) report diagnostica
+echo "— Diagnostica —"
+echo "Pagine senza CSS:"
+grep -RLi --exclude-dir=assets -e 'rel="stylesheet"' . | sed 's/^/  • /' || true
+echo "Pagine con link assoluti residui:"
+grep -Rn --exclude-dir=assets -E 'href="/(assets|it|en|de)/|src="/assets/' . | sed 's/^/  • /' || true
 
-echo "✅ Fix completato."
+echo "✅ Fix + checks completati."
