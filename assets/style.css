@@ -56,3 +56,48 @@ footer a{color:var(--muted)} footer a:hover{color:var(--gold)}
   .hero .mark{width:70px;height:70px}
   .brand img{width:38px;height:38px}
 }
+
+/* ✨ RABE STUDIO — EPILOGUES & STORYTELLER SHARED STYLES */
+.epilogues article, .storyteller blockquote {
+  border-left: 3px solid #d4af37; /* gold accent */
+  padding-left: 1.5rem;
+  margin: 2rem 0;
+  color: #d4c68a;
+  font-style: italic;
+  line-height: 1.7;
+  font-size: 1.05rem;
+  scroll-margin-top: 4rem; /* for smooth anchor scrolling */
+}
+
+.storyteller h2, .epilogues h2 {
+  color: #d4af37;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 1rem;
+}
+
+/* smooth fade-in animation for each article */
+@keyframes fadeInUp {
+  0% {opacity: 0; transform: translateY(15px);}
+  100% {opacity: 1; transform: translateY(0);}
+}
+.epilogues article {
+  animation: fadeInUp 0.8s ease both;
+  transition: opacity 0.4s ease;
+}
+
+/* subtle gold divider under titles */
+.epilogues h1, .storyteller h1 {
+  border-bottom: 1px solid rgba(212,175,55,0.35);
+  padding-bottom: .5rem;
+  margin-bottom: 1.5rem;
+  color: #d4af37;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Back-link hover accent */
+main a:hover {
+  color: #d4af37;
+  transition: color .2s ease;
+}
