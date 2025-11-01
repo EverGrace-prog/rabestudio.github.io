@@ -8,7 +8,7 @@ mk_hith() {
 <!doctype html><html lang="$lang"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>$title · RABE STUDIO</title>
-<base href="$base">
+
 <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="../assets/style.css">
 <style>
